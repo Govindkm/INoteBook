@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
   res.send(`<h1>This is the auth page!</h1>`);
 });
 
-//1. Create a user using POST request
+//1. Create a user using POST request, does not require any authentication for now
 router.post(
   "/",
   [
@@ -27,25 +27,32 @@ router.post(
     body("email", "Enter a valid email id").isEmail(),
     body("password", "Password must be 5 characters").isLength({ min: 5 }),
   ],
-  (req, res) => {
+  async (req, res) => {
+    //validate the express validations (server-side validations)
     const errors = validationResult(req);
+
+    //if there are error log it into the log files as well as send a bad request;
     if (!errors.isEmpty()) {
+      logger.error("Validation failed. Please check the validators.");
       return res.status(400).json({ errors: errors.array() });
     }
-
-    User.create({
-      name: req.body.name,
-      userName: req.body.userName,
-      email: req.body.email,
-      password: req.body.password,
-      gender: req.body.gender,
-      dob: req.body.dob,
-    })
-      .then((user) => res.json(user))
-      .catch((error) => {
-        logger.error(`${error}`);
-        res.json({ error: "Error occured while creating user." });
-      });
+    try {
+      let user = await User.findOne({ userName: req.body.userName });
+      if (user) {
+        res.status(400).json({ error: "Duplicate entry is not allowed" });
+        throw Error("Duplicate entry is not allowed");
+      }
+      await User.create({
+        name: req.body.name,
+        userName: req.body.userName,
+        email: req.body.email,
+        password: req.body.password,
+        gender: req.body.gender,
+        dob: req.body.dob,
+      }).then((user) => res.json(user));
+    } catch (err) {
+      logger.error(err.message);
+    }
   }
 );
 
