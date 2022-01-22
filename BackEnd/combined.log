@@ -1,0 +1,3 @@
+{"level":"error","message":"Error:MongoServerError: E11000 duplicate key error collection: iNoteBook.users index: userName_1 dup key: { userName: \"govinkm123\" }","service":"user-service"}
+{"level":"error","message":"Error:MongoServerError: E11000 duplicate key error collection: iNoteBook.users index: userName_1 dup key: { userName: \"govinkm123\" }","service":"user-service"}
+{"level":"error","message":"Error:MongoServerError: E11000 duplicate key error collection: iNoteBook.users index: userName_1 dup key: { userName: \"govinkm123\" }","service":"user-service"}
