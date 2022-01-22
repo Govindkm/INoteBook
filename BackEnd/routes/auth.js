@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const User = require("../Models/User");
 
 //Authentication operations to be written here
 /*
@@ -16,6 +17,8 @@ router.get("/", (req, res) => {
 
 //1. Create a user using POST request
 router.post("/", (req, res) => {
+  const user = new User(req.body);
+  user.save();
   res.json({
     userCreated: "Success",
   });
