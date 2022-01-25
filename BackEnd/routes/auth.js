@@ -1,11 +1,12 @@
 const express = require("express");
-const { body, validationResult } = require("express-validator");
+const { body, header, validationResult } = require("express-validator");
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
 
 const User = require("../Models/User");
 const logger = require("../logger/logger");
+const jwtInterceptor = require("../middlewares/jwt.interceptor");
 
 const router = express.Router();
 
@@ -13,8 +14,9 @@ const router = express.Router();
 /*
 1. Register user(create new user)
 2. Authenticate(login user)
-3. Delete existing user
-4. Update existing user details
+3. Get User Details
+4. Delete existing user
+5. Update existing user details
 */
 
 router.get("/", (req, res) => {
@@ -103,6 +105,33 @@ router.post(
     } catch (error) {
       logger.error(error);
       res.status(500).json({ error: "internal server error" });
+    }
+  }
+);
+
+//3. Get User Details
+router.post("/get-user-details", jwtInterceptor, async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.userId });
+    res.json(user);
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json({ error: "internal server error" });
+  }
+});
+
+//4. Delete existing user
+router.post(
+  "/delete",
+  [body("authToken", "Cannot perform the specified task").exists()],
+  async (req, res) => {
+    //validate the express validations (server-side validations)
+    const errors = validationResult(req);
+
+    //if there are error log it into the log files as well as send a bad request;
+    if (!errors.isEmpty()) {
+      logger.error("Validation failed. Please check the validators.");
+      return res.status(400).json({ errors: errors.array() });
     }
   }
 );
