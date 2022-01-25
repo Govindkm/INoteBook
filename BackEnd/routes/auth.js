@@ -41,7 +41,7 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
     try {
-      let user = await User.findOne({ userName: req.body.userName });
+      const user = await User.findOne({ userName: req.body.userName });
       if (user) {
         res.status(400).json({ error: "Duplicate entry is not allowed" });
         throw Error("Duplicate entry is not allowed");
@@ -63,11 +63,48 @@ router.post(
       });
     } catch (err) {
       logger.error(err.message);
+      res.status(500).json({ error: "internal server error" });
     }
   }
 );
 
 //2. Authenticate(login user)
-router.post("/login", async (req, res) => {});
+router.post(
+  "/login",
+  [
+    body("email", "Enter a valid email id").isEmail(),
+    body("password", "Password cannot be blank").isLength({ min: 5 }),
+  ],
+  async (req, res) => {
+    //validate the express validations (server-side validations)
+    const errors = validationResult(req);
+
+    //if there are error log it into the log files as well as send a bad request;
+    if (!errors.isEmpty()) {
+      logger.error("Validation failed. Please check the validators.");
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const user = await User.findOne({ userName: req.body.userName });
+      if (!user) {
+        logger.error(`Username not found.`);
+        res.status(400).json({ error: "Please try with valid credentials." });
+      }
+      const { password } = req.body;
+      const isAuthenticated = await bcrypt.compare(password, user.password);
+      if (isAuthenticated) {
+        const authToken = jwt.sign({ id: user._id }, process.env.SECRET);
+        res.json({ authToken });
+      } else {
+        res.status(403).json("User Authentication failed");
+        logger.error("User Authentication failed");
+      }
+    } catch (error) {
+      logger.error(error);
+      res.status(500).json({ error: "internal server error" });
+    }
+  }
+);
 
 module.exports = router;
