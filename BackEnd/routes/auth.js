@@ -1,5 +1,9 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
+require("dotenv").config();
+const bcrypt = require("bcryptjs");
+var jwt = require("jsonwebtoken");
+
 const User = require("../Models/User");
 const logger = require("../logger/logger");
 
@@ -20,7 +24,7 @@ router.get("/", (req, res) => {
 
 //1. Create a user using POST request, does not require any authentication for now
 router.post(
-  "/",
+  "/create-user",
   [
     body("name", "Enter a valid name").isLength({ min: 3 }),
     body("userName", "Enter a valid user name").isLength({ min: 3 }),
@@ -42,18 +46,28 @@ router.post(
         res.status(400).json({ error: "Duplicate entry is not allowed" });
         throw Error("Duplicate entry is not allowed");
       }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashPassword = await bcrypt.hash(req.body.password, salt);
+
       await User.create({
         name: req.body.name,
         userName: req.body.userName,
         email: req.body.email,
-        password: req.body.password,
+        password: hashPassword,
         gender: req.body.gender,
         dob: req.body.dob,
-      }).then((user) => res.json(user));
+      }).then((user) => {
+        const authToken = jwt.sign({ id: user._id }, process.env.SECRET);
+        res.json({ authToken });
+      });
     } catch (err) {
       logger.error(err.message);
     }
   }
 );
+
+//2. Authenticate(login user)
+router.post("/login", async (req, res) => {});
 
 module.exports = router;
