@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const logger = require("./logger/logger");
 require("dotenv").config();
-const dbURI = `${process.env.DB_HOST}${process.env.DB_NAME}?readPreference=primary&appname=MongoDB%20Compass&ssl=false`;
+const dbURI = `${process.env.DB_HOST}`;
 
 const connectToDB = () => {
   console.log(dbURI);
