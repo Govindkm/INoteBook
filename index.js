@@ -4,7 +4,7 @@ const connectToDB = require("./db");
 require("dotenv").config();
 
 const app = express();
-const port = process.env.EXPRESS_PORT || 3000;
+const port = process.env.PORT || process.env.EXPRESS_PORT;
 
 // Auth0 authentication is paid and use it later after using bycrptjs
 
