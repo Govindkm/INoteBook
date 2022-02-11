@@ -1,5 +1,5 @@
 const express = require("express");
-const { body, header, validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
@@ -18,6 +18,10 @@ const router = express.Router();
 4. Delete existing user
 5. Update existing user details
 */
+
+const createJWTToken = (id) => {
+  return jwt.sign({ id: id }, process.env.SECRET, { expiresIn: "1d" });
+};
 
 router.get("/", (req, res) => {
   console.log(req.body);
@@ -60,7 +64,7 @@ router.post(
         gender: req.body.gender,
         dob: req.body.dob,
       }).then((user) => {
-        const authToken = jwt.sign({ id: user._id }, process.env.SECRET);
+        const authToken = createJWTToken(user._id);
         res.json({ authToken });
       });
     } catch (err) {
@@ -96,7 +100,7 @@ router.post(
       const { password } = req.body;
       const isAuthenticated = await bcrypt.compare(password, user.password);
       if (isAuthenticated) {
-        const authToken = jwt.sign({ id: user._id }, process.env.SECRET);
+        const authToken = createJWTToken(user._id);
         res.json({ authToken });
       } else {
         res.status(403).json("User Authentication failed");
@@ -112,7 +116,7 @@ router.post(
 //3. Get User Details
 router.post("/get-user-details", jwtInterceptor, async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.userId });
+    const user = await User.findOne({ _id: req.userId }).select("-password");
     res.json(user);
   } catch (error) {
     logger.error(error);

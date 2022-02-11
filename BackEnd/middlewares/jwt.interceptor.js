@@ -14,7 +14,8 @@ async function jwtInterceptor(req, res, next) {
     req.userId = data.id;
     next();
   } catch (error) {
-    res.status(500).json("Internal Server Error");
+    res.status(401).json(`Please authenticate with valid token.`);
+    logger.error(error);
   }
 }
 
