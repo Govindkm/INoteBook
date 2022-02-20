@@ -16,7 +16,7 @@ const router = express.Router();
 //1. Get all the notes
 router.get("/getallnotes", jwtInterceptor, async (req, res) => {
   const notes = await note.find({ userid: req.userId });
-  res.send(notes);
+ return res.send(notes);
 });
 
 //2. Create a new note
@@ -38,10 +38,10 @@ router.post(
         tag: req.body.tag,
         date: req.body.date,
       });
-      res.json(created);
+      return res.json(created);
     } catch (error) {
       logger.error(err.message);
-      res.status(500).json({ error: "internal server error" });
+      return res.status(500).json({ error: "internal server error" });
     }
   }
 );
@@ -74,13 +74,13 @@ router.put(
         }
       );
       if (created) {
-        res.status(200).json(created);
+        return res.status(200).json(created);
       } else {
-        res.status(404).json({ message: "No data found" });
+        return res.status(404).json({ message: "No data found" });
       }
     } catch (error) {
       logger.error(err.message);
-      res.status(500).json({ error: "internal server error" });
+      return res.status(500).json({ error: "internal server error" });
     }
   }
 );
@@ -103,13 +103,13 @@ router.delete(
         userid: req.userId,
       });
       if (created) {
-        res.status(200).json(created);
+        return res.status(200).json(created);
       } else {
-        res.status(404).json({ message: "No data found" });
+        return res.status(404).json({ message: "No data found" });
       }
     } catch (error) {
       logger.error(err.message);
-      res.status(500).json({ error: "internal server error" });
+      return res.status(500).json({ error: "internal server error" });
     }
   }
 );
@@ -120,10 +120,10 @@ router.delete("/deleteall", jwtInterceptor, async (req, res) => {
     const created = await note.deleteMany({
       userid: req.userId,
     });
-    res.json(created);
+    return res.json(created);
   } catch (error) {
     logger.error(err.message);
-    res.status(500).json({ error: "internal server error" });
+    return res.status(500).json({ error: "internal server error" });
   }
 });
 

@@ -25,7 +25,7 @@ const createJWTToken = (id) => {
 
 router.get("/", (req, res) => {
   console.log(req.body);
-  res.send(`<h1>This is the auth page!</h1>`);
+  return res.send(`<h1>This is the auth page!</h1>`);
 });
 
 //1. Create a user using POST request, does not require any authentication for now
@@ -49,8 +49,8 @@ router.post(
     try {
       const user = await User.findOne({ userName: req.body.userName });
       if (user) {
-        res.status(400).json({ error: "Duplicate entry is not allowed" });
         throw Error("Duplicate entry is not allowed");
+        return res.status(400).json({ error: "Duplicate entry is not allowed" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -65,11 +65,11 @@ router.post(
         dob: req.body.dob,
       }).then((user) => {
         const authToken = createJWTToken(user._id);
-        res.json({ authToken });
+        return res.json({ authToken });
       });
     } catch (err) {
       logger.error(err.message);
-      res.status(500).json({ error: "internal server error" });
+      return res.status(500).json({ error: "internal server error" });
     }
   }
 );
@@ -95,20 +95,20 @@ router.post(
       const user = await User.findOne({ userName: req.body.userName });
       if (!user) {
         logger.error(`Username not found.`);
-        res.status(400).json({ error: "Please try with valid credentials." });
+        return res.status(400).json({ error: "Please try with valid credentials." });
       }
       const { password } = req.body;
       const isAuthenticated = await bcrypt.compare(password, user.password);
       if (isAuthenticated) {
         const authToken = createJWTToken(user._id);
-        res.json({ authToken });
+        return res.json({ authToken });
       } else {
-        res.status(403).json("User Authentication failed");
         logger.error("User Authentication failed");
+        return res.status(403).json("User Authentication failed");
       }
     } catch (error) {
       logger.error(error);
-      res.status(500).json({ error: "internal server error" });
+      return res.status(500).json({ error: "internal server error" });
     }
   }
 );
@@ -117,10 +117,10 @@ router.post(
 router.post("/get-user-details", jwtInterceptor, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.userId }).select("-password");
-    res.json(user);
+    return res.json(user);
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ error: "internal server error" });
+    return res.status(500).json({ error: "internal server error" });
   }
 });
 
