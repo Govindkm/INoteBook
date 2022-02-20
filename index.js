@@ -22,7 +22,11 @@ const corsOptions ={
   credentials:true,            //access-control-allow-credentials:true
   optionSuccessStatus:200,
 }
+try {
 connectToDB();
+} catch (error) {
+  console.error(`Database connection failed with error : ${error}`);
+}
 app.use(cors(corsOptions));
 
 //To use the body json we need to pass the request through json parser
