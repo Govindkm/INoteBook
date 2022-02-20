@@ -78,7 +78,7 @@ router.post(
 router.post(
   "/login",
   [
-    body("email", "Enter a valid email id").isEmail(),
+    body("userName", "Enter a valid userName").isLength({ min: 5 }),
     body("password", "Password cannot be blank").isLength({ min: 5 }),
   ],
   async (req, res) => {
@@ -95,20 +95,22 @@ router.post(
       const user = await User.findOne({ userName: req.body.userName });
       if (!user) {
         logger.error(`Username not found.`);
-        return res.status(400).json({ error: "Please try with valid credentials." });
+        return res
+          .status(400)
+          .json({ error: "Please try with valid credentials." });
       }
       const { password } = req.body;
       const isAuthenticated = await bcrypt.compare(password, user.password);
       if (isAuthenticated) {
         const authToken = createJWTToken(user._id);
-        return res.json({ authToken });
+        res.json({ authToken });
       } else {
+        res.status(403).json("User Authentication failed");
         logger.error("User Authentication failed");
-        return res.status(403).json("User Authentication failed");
       }
     } catch (error) {
       logger.error(error);
-      return res.status(500).json({ error: "internal server error" });
+      res.status(500).json({ error: "internal server error" });
     }
   }
 );
