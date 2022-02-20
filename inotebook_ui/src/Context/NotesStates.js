@@ -10,7 +10,7 @@ const NoteStates = (props) => {
   const [Notes, setNotes] = useState([]);
   const [edit, setEdit] = useState({ isEdit: false, item: null });
 
-  const NotesURL = `http://localhost:5000/api/notes`;
+  const NotesURL = `https://express-inotebook.herokuapp.com/api/notes`;
 
   const getAllNotes = async () => {
     const URL = NotesURL + "/getallnotes";
@@ -83,7 +83,8 @@ const NoteStates = (props) => {
         addItem,
         deleteItem,
         getAllNotes,
-      }}>
+      }}
+    >
       {props.children}
     </NotesContext.Provider>
   );

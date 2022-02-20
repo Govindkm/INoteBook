@@ -5,7 +5,7 @@ import axios from "axios";
 
 const Login = () => {
   const navigate = useNavigate();
-  const Auth_URL = "http://localhost:5000/api/auth";
+  const Auth_URL = "https://express-inotebook.herokuapp.com/api/auth";
   const submitHandler = async (e) => {
     e.preventDefault();
     const URL = Auth_URL + "/login";

@@ -3,7 +3,7 @@ import React from "react";
 import { Form, Button } from "react-bootstrap";
 
 const Signup = () => {
-  const Auth_URL = "http://localhost:5000/api/auth";
+  const Auth_URL = "https://express-inotebook.herokuapp.com/api/auth";
   const submitHandler = async (e) => {
     e.preventDefault();
     const URL = Auth_URL + "/create-user";
