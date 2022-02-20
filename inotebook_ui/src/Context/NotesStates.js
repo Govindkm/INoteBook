@@ -1,42 +1,89 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NotesContext from "./NotesContext";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 const NoteStates = (props) => {
-  const sample = [
-    {
-      _id: "62035464fd1f8023fbe6cbda",
-      userid: "61ef9fe60d4702c9da93bc19",
-      title: "Great lakes university 1",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora blanditiis illum doloremque eaque dignissimos, earum vel aperiam eligendi quibusdam et doloribus quae quis, minus non ipsum sit eos? Optio, asperiores.",
-      tag: "Garam Masala",
-      date: "3762-07-10T15:09:25.565Z",
-      __v: 0,
-    },
-    {
-      _id: "62035464fd1f80gdgg23fbe6cbda",
-      userid: "61ef9fe60d4702c9da93bc19",
-      title: "Great lakes university 2",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora blanditiis illum doloremque eaque dignissimos, earum vel aperiam eligendi quibusdam et doloribus quae quis, minus non ipsum sit eos? Optio, asperiores.",
-      tag: "Garam Masala",
-      date: "3762-07-10T15:09:25.565Z",
-      __v: 0,
-    },
-    {
-      _id: "62035464faaddd1f8023fbe6cbda",
-      userid: "61ef9fe60d4702c9da93bc19",
-      title: "Great lakes university 3",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora blanditiis illum doloremque eaque dignissimos, earum vel aperiam eligendi quibusdam et doloribus quae quis, minus non ipsum sit eos? Optio, asperiores.",
-      tag: "Garam Masala",
-      date: "3762-07-10T15:09:25.565Z",
-      __v: 0,
-    },
-  ];
-  const [Notes, setNotes] = useState(sample);
-  const [Form, setForm] = useState({ isEdit: false, item: null });
+  const [authToken, setAuthToken] = useState(
+    localStorage.getItem("auth-token")
+  );
+
+  const [Notes, setNotes] = useState([]);
+  const [edit, setEdit] = useState({ isEdit: false, item: null });
+
+  const NotesURL = `http://localhost:5000/api/notes`;
+
+  const getAllNotes = async () => {
+    const URL = NotesURL + "/getallnotes";
+    const response = await axios.get(URL, {
+      headers: {
+        "auth-token": authToken,
+      },
+    });
+    setNotes(response.data);
+  };
+
+  const addItem = async () => {
+    if (edit.isEdit) {
+      //Logic for editing
+      setNotes((currentState) => {
+        currentState[
+          currentState.findIndex((item) => item._id == edit.item._id)
+        ] = edit.item;
+        console.info("Editing Note", currentState);
+        setNotes(currentState);
+
+        const URL = NotesURL + "/updatenote";
+        axios.put(
+          URL,
+          { ...edit.item, id: edit.item._id },
+          {
+            headers: {
+              "auth-token": authToken,
+            },
+          }
+        );
+      });
+    } else {
+      //Logic for adding
+      console.info("Adding Note");
+      const URL = NotesURL + "/createnote";
+      const result = await axios.post(
+        URL,
+        { ...edit.item, date: Date.now() },
+        { headers: { "auth-token": authToken } }
+      );
+
+      setNotes((currentState) => {
+        currentState = [...currentState, result.data];
+        setNotes(currentState);
+      });
+    }
+  };
+
+  function deleteItem(id) {
+    console.warn("Deleting the item with id : " + id);
+    setNotes((currentState) => {
+      currentState = currentState.filter((item) => item._id !== id);
+      setNotes(currentState);
+
+      const URL = NotesURL + "/deletenote";
+      axios.delete(URL, {
+        headers: { "auth-token": authToken },
+        data: { id: id },
+      });
+    });
+  }
   return (
-    <NotesContext.Provider value={{ Notes, setNotes, Form, setForm }}>
+    <NotesContext.Provider
+      value={{
+        Notes,
+        setNotes,
+        edit,
+        setEdit,
+        addItem,
+        deleteItem,
+        getAllNotes,
+      }}>
       {props.children}
     </NotesContext.Provider>
   );

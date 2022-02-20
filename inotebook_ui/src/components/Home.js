@@ -1,10 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import NotesContext from "../Context/NotesContext";
 import NoteForm from "./notes/NoteForm";
 import Notes from "./notes/Notes";
 
 export default function Home() {
-  const { Notes: myNotes, Form: edit } = useContext(NotesContext);
+  const { Notes: myNotes, edit, getAllNotes } = useContext(NotesContext);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const authToken = localStorage.getItem("auth-token");
+    if (authToken) getAllNotes();
+    else navigate("/login");
+  }, []);
   return (
     <>
       <div className="my-3">

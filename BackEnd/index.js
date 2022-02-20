@@ -2,6 +2,7 @@ const express = require("express");
 // const { auth } = require("express-openid-connect");
 const connectToDB = require("./db");
 require("dotenv").config();
+const cors = require("cors");
 
 const app = express();
 const port = process.env.EXPRESS_PORT || 3000;
@@ -18,6 +19,8 @@ const port = process.env.EXPRESS_PORT || 3000;
 // );
 
 connectToDB();
+//add cors headers in the request and response for cross origin communication
+app.use(cors());
 
 //To use the body json we need to pass the request through json parser
 app.use(express.json());

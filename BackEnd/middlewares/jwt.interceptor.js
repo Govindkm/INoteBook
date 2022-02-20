@@ -6,7 +6,6 @@ async function jwtInterceptor(req, res, next) {
   const token = req.header("auth-token");
   if (!token) {
     logger.error(`Unauthorized access. Auth-token missing in request.`);
-    res.status(401).json(`Please authenticate with valid token.`);
   }
   try {
     console.log(jwt.decode(token, process.env.SECRET));

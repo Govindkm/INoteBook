@@ -3,16 +3,16 @@ import { Accordion, Card } from "react-bootstrap";
 import NotesContext from "../../Context/NotesContext";
 
 export default function (props) {
-  const { setForm } = useContext(NotesContext);
+  const { setEdit, deleteItem } = useContext(NotesContext);
 
   //Click Handler uses currentTarget to fetch id during bubbling of the events
   function clickHandler(e) {
     console.info("Target: ", e.currentTarget.id);
     if (e.currentTarget.id == "editBtn") {
       console.info("Adding item to edit");
-      setForm({ isEdit: true, item: props.note });
+      setEdit({ isEdit: true, item: props.note });
     } else if (e.currentTarget.id == "deleteBtn") {
-      console.warn("Deleting item");
+      deleteItem(props.note._id);
     }
   }
 
@@ -58,7 +58,7 @@ export default function (props) {
             type="button"
             id="deleteBtn"
             className="btn btn-outline-danger mx-2"
-            onClick={clickHandler.bind("delete")}>
+            onClick={clickHandler}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"

@@ -1,11 +1,25 @@
-import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Router, useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   let location = useLocation();
-
+  let [isLoggedin, setLoggedIn] = useState(false);
   // equivalent to component did mount
-  useEffect(() => {}, [location]);
+  useEffect(() => {
+    if (localStorage.getItem("auth-token")) {
+      setLoggedIn(true);
+    } else {
+      setLoggedIn(false);
+    }
+  }, [location]);
+  const navigate = useNavigate();
+
+  function loginClickhandler(e) {
+    if (isLoggedin) {
+      localStorage.removeItem("auth-token");
+    }
+    navigate("/login");
+  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -51,7 +65,9 @@ export default function Navbar() {
           </ul>
         </div>
         <div className="ml-auto">
-          <button className="btn btn-outline-light">Login</button>
+          <button className="btn btn-outline-light" onClick={loginClickhandler}>
+            {isLoggedin ? "Logout" : "Login"}
+          </button>
         </div>
       </div>
     </nav>

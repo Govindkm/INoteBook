@@ -4,7 +4,8 @@ import NotesContext from "../../Context/NotesContext";
 import NoteItem from "./NoteItem";
 
 export default function Notes() {
-  const { Notes, setNotes } = useContext(NotesContext);
+  const { Notes } = useContext(NotesContext);
+
   return (
     <div>
       <Accordion flush>
