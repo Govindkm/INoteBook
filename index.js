@@ -17,7 +17,11 @@ const port = process.env.PORT || process.env.EXPRESS_PORT;
 //     secret: process.env.SECRET,
 //   })
 // );
-
+const corsOptions ={
+  origin:'*', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200,
+}
 connectToDB();
 app.use(cors(corsOptions));
 
