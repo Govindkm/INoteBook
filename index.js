@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 // const { auth } = require("express-openid-connect");
 const connectToDB = require("./db");
 require("dotenv").config();
@@ -20,6 +21,7 @@ const port = process.env.PORT || process.env.EXPRESS_PORT;
 connectToDB();
 
 //To use the body json we need to pass the request through json parser
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
