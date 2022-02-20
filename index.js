@@ -17,9 +17,7 @@ const port = process.env.PORT || process.env.EXPRESS_PORT;
 //     secret: process.env.SECRET,
 //   })
 // );
-const corsOptions ={
-  origin:'*'
-}
+
 connectToDB();
 app.use(cors(corsOptions));
 
